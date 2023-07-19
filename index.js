@@ -46,24 +46,34 @@ async function run() {
       res.send(result);
     });
 
-    //get products
-
+    //get all products
     app.get("/products", async (req, res) => {
       const result = await productsCollection.find().toArray();
       res.send(result);
     });
-    //find best rated product
+
+    //get specific product
+    app.get("/product/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productsCollection.findOne(query);
+      res.send(result);
+    });
+
+    //get best rated product
     app.get("/bestseller", async (req, res) => {
       const cursor = productsCollection.find().sort({ rating: -1 });
       const result = await cursor.limit(8).toArray();
       res.send(result);
     });
+
     //post selected item
     app.post("/carts", async (req, res) => {
       const items = req.body;
       const result = await selectedCollection.insertOne(items);
       res.send(result);
     });
+
     //get selected item
     app.get("/carts", async (req, res) => {
       const email = req.query.email;
@@ -74,6 +84,7 @@ async function run() {
       const result = await selectedCollection.find(query).toArray();
       res.send(result);
     });
+
     //quantity increase
     app.put("/increase/:id", async (req, res) => {
       const id = req.params.id;
@@ -92,6 +103,7 @@ async function run() {
       );
       res.send(result);
     });
+
     //quantity decrease
     app.put("/decrease/:id", async (req, res) => {
       const id = req.params.id;
@@ -110,6 +122,7 @@ async function run() {
       );
       res.send(result);
     });
+
     //item delete
     app.delete("/itemDelete/:id", async (req, res) => {
       const id = req.params.id;
@@ -117,6 +130,7 @@ async function run() {
       const result = await selectedCollection.deleteOne(query);
       res.send(result);
     });
+
     //catrgory ways get data
     app.get("/category", async (req, res) => {
       const category = req.query.category;
@@ -124,6 +138,7 @@ async function run() {
       const result = await productsCollection.find(query).limit(15).toArray();
       res.send(result);
     });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
