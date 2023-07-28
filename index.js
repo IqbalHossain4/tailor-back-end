@@ -138,7 +138,20 @@ async function run() {
       const result = await productsCollection.find(query).limit(15).toArray();
       res.send(result);
     });
+    //category ways get all data
 
+    app.get("/categories", async (req, res) => {
+      const category = req.query.category;
+      const query = { category: category };
+      const result = await productsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //pagination for category product
+    app.get("/totalProducts", async (req, res) => {
+      const result = await productsCollection.estimatedDocumentCount();
+      res.send({ totalProduc: result });
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
