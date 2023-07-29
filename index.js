@@ -46,9 +46,48 @@ async function run() {
       res.send(result);
     });
 
+    app.patch("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateStatus = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const UpdateDoc = {
+        $set: {
+          status: updateStatus.status,
+        },
+      };
+      const result = await users.updateOne(filter, UpdateDoc, options);
+      res.send(result);
+    });
+
+    //post product
+    app.post("/products", async (req, res) => {
+      const query = req.body;
+      const result = await productsCollection.insertOne(query);
+      res.send(result);
+    });
+
     //get all products
     app.get("/products", async (req, res) => {
       const result = await productsCollection.find().toArray();
+      res.send(result);
+    });
+    //get products with specific owner
+    app.get("/ownProduct", async (req, res) => {
+      const email = req.query.email;
+      if (!email) {
+        res.send([]);
+      }
+      const query = { email: email };
+      const result = await productsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //delete specific id with products id
+    app.delete("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productsCollection.deleteOne(query);
       res.send(result);
     });
 
@@ -57,6 +96,31 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await productsCollection.findOne(query);
+      res.send(result);
+    });
+    //update data with specific id
+    app.put("/productUpdate/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateValue = req.body;
+      const query = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          name: updateValue.name,
+          photoOne: updateValue.photoOne,
+          photoTwo: updateValue.photoTwo,
+          photoThree: updateValue.photoThree,
+          category: updateValue.category,
+          productName: updateValue.productName,
+          price: updateValue.price,
+          totalQuantity: updateValue.totalQuantity,
+        },
+      };
+      const result = await productsCollection.updateOne(
+        query,
+        updateDoc,
+        options
+      );
       res.send(result);
     });
 
